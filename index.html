@@ -53,7 +53,6 @@ body{background:#09090b;color:#f4f4f5;font-family:system-ui,sans-serif;padding-b
 </head>
 <body>
 <div class="wrap">
-  <div id="errbox" class="hide" style="background:#7f1d1d;color:#fecaca;padding:10px;border-radius:10px;font-size:12px;margin-bottom:12px"></div>
   <div class="hdr">
     <div class="logo"><div class="logo-i">F</div>Fi<span>Track</span></div>
     <span class="pill">Pro Unlocked</span>
@@ -134,8 +133,7 @@ body{background:#09090b;color:#f4f4f5;font-family:system-ui,sans-serif;padding-b
   </div>
 </div>
 <script>
-window.onerror=function(m,u,l){var e=document.getElementById('errbox');e.classList.remove('hide');e.textContent='Error baris '+l+': '+m};
-const KEY='fitrack_v7';
+const KEY='fitrack_live';
 let sport='run',st='idle',pts=[],dist=0,sec=0,tmr=null,wid=null,map=null,poly=null,mrk=null,dmap=null;
 const $=id=>document.getElementById(id);
 const hav=(a,b,c,d)=>{const R=6371000,r=x=>x*Math.PI/180,dL=r(c-a),dO=r(d-b),k=Math.sin(dL/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(k),Math.sqrt(1-k))};
@@ -151,3 +149,8 @@ function init(){
     map=L.map('map',{zoomControl:false}).setView(c,15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{className:'dark-tiles'}).addTo(map);
     poly=L.polyline([],{color:'#f97316',weight:5}).addTo(map);
+    mrk=L.circleMarker(c,{radius:7,color:'#fff',fillColor:'#f97316',fillOpacity:1}).addTo(map);
+  }
+  if('geolocation'in navigator){
+    navigator.geolocation.getCurrentPosition(p=>{
+      const pos=new L.LatLng(p.coords.latitude,p.coords.longitude);
