@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FiTrack</title>
+<link rel="stylesheet" href="https://unpkg.com">
+<script src="https://unpkg.com"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#09090b;color:#f4f4f5;font-family:system-ui,sans-serif;padding-bottom:84px}
+.wrap{max-width:460px;margin:0 auto;padding:18px 16px}
+.hide{display:none!important}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:21px}
+.logo-i{width:32px;height:32px;border-radius:9px;background:#f97316;display:grid;place-items:center;color:#fff}
+.logo span{color:#f97316}
+.pill{font-size:11px;color:#34d399;background:#18181b;padding:5px 11px;border-radius:99px;border:1px solid #27272a;font-weight:700}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.tabs{display:flex;background:#18181b;padding:4px;border-radius:12px;border:1px solid #27272a}
+.tbtn{padding:6px 14px;border-radius:9px;font-size:13px;font-weight:700;border:0;background:0;color:#a1a1aa}
+.tbtn.on{background:#f97316;color:#fff}
+.mapbox{position:relative;height:230px;border-radius:18px;overflow:hidden;border:1px solid #27272a;background:#18181b;margin-bottom:14px}
+#map,#dmap{width:100%;height:100%}
+.leaflet-control-attribution{display:none!important}
+.dark-tiles{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)}
+.demo{position:absolute;bottom:10px;right:10px;z-index:500;background:#18181bee;color:#fb923c;border:1px solid #f9731666;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:700}
+.card{background:#18181b;border:1px solid #27272a;border-radius:18px;padding:18px;margin-bottom:14px}
+.tc{text-align:center}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#a1a1aa;font-weight:700}
+.big{font-size:46px;font-weight:900;margin:4px 0}
+.big span{font-size:18px;color:#f97316}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #27272a}
+.mval{font-size:18px;font-weight:800;margin-top:2px}
+.org{color:#fb923c}.grn{color:#34d399}
+.inp{width:100%;background:#18181b;border:1px solid #3f3f46;border-radius:14px;padding:13px 15px;font-size:14px;color:#fff;margin-bottom:12px;outline:0}
+.btn{width:100%;padding:15px;border-radius:15px;border:0;font-weight:900;font-size:15px}
+.b-org{background:#f97316;color:#fff}.b-amb{background:#f59e0b;color:#09090b}.b-grn{background:#10b981;color:#09090b}.b-red{background:#ef4444;color:#fff}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hero{background:linear-gradient(135deg,#f97316,#d97706);border-radius:18px;padding:18px;color:#fff;margin-bottom:18px}
+.sec{font-size:12px;font-weight:800;text-transform:uppercase;color:#e4e4e7;margin-bottom:10px;display:flex;justify-content:space-between}
+.prbox{background:#18181b;border:1px solid #27272a;padding:12px;border-radius:14px;text-align:center}
+.act{background:#18181b;border:1px solid #27272a;border-radius:16px;padding:15px;margin-bottom:10px}
+.mpill{background:#09090b;padding:8px 4px;border-radius:10px;text-align:center}
+.srow{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:9px}
+.strack{flex:1;background:#09090b;height:16px;border-radius:99px;padding:2px;overflow:hidden}
+.sfill{height:100%;background:linear-gradient(90deg,#ea580c,#fb923c);border-radius:99px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#09090bf2;border-top:1px solid #27272a;z-index:1000}
+.nav-in{max-width:460px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;height:62px}
+.nbtn{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:#71717a}
+.nbtn.on{color:#f97316}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="errbox" class="hide" style="background:#7f1d1d;color:#fecaca;padding:10px;border-radius:10px;font-size:12px;margin-bottom:12px"></div>
+  <div class="hdr">
+    <div class="logo"><div class="logo-i">F</div>Fi<span>Track</span></div>
+    <span class="pill">Pro Unlocked</span>
+  </div>
+  <div id="v-rec">
+    <div class="bar">
+      <div class="tabs">
+        <button id="s-run" class="tbtn on">🏃 Lari</button>
+        <button id="s-ride" class="tbtn">🚴 Sepeda</button>
+      </div>
+      <span id="gps" class="pill">Cek GPS...</span>
+    </div>
+    <div class="mapbox">
+      <div id="map"></div>
+      <button id="b-demo" class="demo">⚡ Buat Data Demo</button>
+    </div>
+    <div class="card tc">
+      <div class="lbl">Jarak Tempuh</div>
+      <div class="big"><span id="m-dist">0.00</span> <span>km</span></div>
+      <div class="g3">
+        <div><div class="lbl">Durasi</div><div id="m-time" class="mval">00:00</div></div>
+        <div><div class="lbl">Pace Kini</div><div id="m-cpace" class="mval org">--:--</div></div>
+        <div><div class="lbl">Rata-rata</div><div id="m-apace" class="mval">--:--</div></div>
+      </div>
+    </div>
+    <input id="in-title" class="inp hide" placeholder="Nama aktivitas (opsional)...">
+    <button id="b-start" class="btn b-org">MULAI REKAM</button>
+    <button id="b-pause" class="btn b-amb hide">JEDA (PAUSE)</button>
+    <div id="g-pause" class="g2 hide">
+      <button id="b-res" class="btn b-grn">LANJUTKAN</button>
+      <button id="b-fin" class="btn b-red">SELESAI & SIMPAN</button>
+    </div>
+  </div>
+  <div id="v-dash" class="hide">
+    <div class="hero">
+      <div class="lbl" style="color:#fff;opacity:.9">Total Jarak Tercatat</div>
+      <div style="font-size:34px;font-weight:900;margin:4px 0"><span id="d-km">0.00</span> <span style="font-size:16px">km</span></div>
+      <div id="d-cnt" style="font-size:12px;opacity:.9">0 aktivitas tersimpan</div>
+    </div>
+    <div class="sec"><span>🏆 Rekor Pribadi (PR)</span><span class="grn">Otomatis</span></div>
+    <div class="g3" style="border:0;margin:0 0 18px;padding:0">
+      <div class="prbox"><div class="org" style="font-size:12px;font-weight:800">1K</div><div id="pr-1" class="mval">--:--</div></div>
+      <div class="prbox"><div class="org" style="font-size:12px;font-weight:800">5K</div><div id="pr-5" class="mval">--:--</div></div>
+      <div class="prbox"><div class="org" style="font-size:12px;font-weight:800">10K</div><div id="pr-10" class="mval">--:--</div></div>
+    </div>
+    <div class="sec"><span>Riwayat Aktivitas</span></div>
+    <div id="act-list"></div>
+  </div>
+  <div id="v-det" class="hide">
+    <div class="bar">
+      <button id="b-back" style="background:none;border:0;color:#fb923c;font-weight:700;font-size:14px">← Kembali</button>
+      <div style="display:flex;gap:8px">
+        <button id="b-gpx" style="padding:6px 11px;border-radius:9px;background:#27272a;color:#fff;border:1px solid #3f3f46;font-size:12px;font-weight:700">⬇ GPX</button>
+        <button id="b-del" style="padding:6px 11px;border-radius:9px;background:#7f1d1d55;color:#f87171;border:1px solid #ef444466;font-size:12px;font-weight:700">Hapus</button>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div id="det-meta" class="org" style="font-size:11px;font-weight:700;text-transform:uppercase"></div>
+      <h2 id="det-title" style="font-size:21px;font-weight:900;margin-top:2px"></h2>
+    </div>
+    <div id="dmap-box" class="mapbox"><div id="dmap"></div></div>
+    <div class="g2" style="margin-bottom:14px">
+      <div class="card" style="margin:0"><div class="lbl">Jarak</div><div id="det-dist" class="mval">0.00 km</div></div>
+      <div class="card" style="margin:0"><div class="lbl">Durasi</div><div id="det-time" class="mval">00:00</div></div>
+      <div class="card" style="margin:0"><div class="lbl">Rata-rata Pace</div><div id="det-pace" class="mval org">--:--</div></div>
+      <div class="card" style="margin:0"><div class="lbl">Kalori</div><div id="det-cal" class="mval grn">0 kcal</div></div>
+    </div>
+    <div class="card">
+      <div class="sec"><span>Analitik Pace per KM</span><span class="org">GRATIS</span></div>
+      <div id="det-splits"></div>
+    </div>
+  </div>
+</div>
+<div class="nav">
+  <div class="nav-in">
+    <button id="n-rec" class="nbtn on"><span style="font-size:18px">📍</span>Rekam GPS</button>
+    <button id="n-dash" class="nbtn"><span style="font-size:18px">📊</span>Dashboard & PR</button>
+  </div>
+</div>
+<script>
+window.onerror=function(m,u,l){var e=document.getElementById('errbox');e.classList.remove('hide');e.textContent='Error baris '+l+': '+m};
+const KEY='fitrack_v7';
+let sport='run',st='idle',pts=[],dist=0,sec=0,tmr=null,wid=null,map=null,poly=null,mrk=null,dmap=null;
+const $=id=>document.getElementById(id);
+const hav=(a,b,c,d)=>{const R=6371000,r=x=>x*Math.PI/180,dL=r(c-a),dO=r(d-b),k=Math.sin(dL/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(k),Math.sqrt(1-k))};
+const fD=m=>(m/1000).toFixed(2);
+const fT=s=>{if(!s||s<0)return'00:00';s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;return h>0?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`};
+const fP=p=>{if(!p||!isFinite(p)||p<=0||p>3600)return'--:--';return`${Math.floor(p/60)}:${String(Math.floor(p%60)).padStart(2,'0')}`};
+const getL=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}};
+const setL=l=>localStorage.setItem(KEY,JSON.stringify(l));
+
+function init(){
+  if(typeof L!=='undefined'){
+    const c=new L.LatLng(-0.415,116.985);
+    map=L.map('map',{zoomControl:false}).setView(c,15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{className:'dark-tiles'}).addTo(map);
+    poly=L.polyline([],{color:'#f97316',weight:5}).addTo(map);
